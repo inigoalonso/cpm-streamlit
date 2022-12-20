@@ -65,7 +65,26 @@ DSM =  [[0,1,1,0,0,0],
         [1,1,1,0,0,1],
         [0,0,1,1,0,1],
         [1,1,1,1,1,0]]
+A = pd.DataFrame(DSM, index=product_components, columns=product_components)
+G = nx.from_pandas_adjacency(A, create_using=nx.DiGraph)
 
+from st_aggrid import AgGrid
+from st_aggrid.grid_options_builder import GridOptionsBuilder
+
+gb = GridOptionsBuilder.from_dataframe(A)
+
+gb.configure_default_column(min_column_width = 2, resizable = False, filterable = False, sorteable = False, editable = True, groupable = False)
+
+gb.configure_grid_options(columnHoverHighlight=True)
+
+gridOptions = gb.build()
+
+AgGrid(
+    A,
+    gridOptions=gridOptions,
+    enable_enterprise_modules=True,
+    allow_unsafe_jscode=True
+)
 
 col1, col2 = st.columns(2)
 
@@ -79,9 +98,8 @@ with col1:
         f. casing
     ''')
 
+
 with col2:
-    A = pd.DataFrame(DSM, index=product_components, columns=product_components)
-    G = nx.from_pandas_adjacency(A, create_using=nx.DiGraph)
     # fig, ax = plt.subplots()
     # pos = nx.kamada_kawai_layout(G)
     # nx.draw(G,pos, with_labels=True)
