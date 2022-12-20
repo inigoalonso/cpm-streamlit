@@ -8,3 +8,4 @@ networkx
 seaborn
 pyvis
 scipy
+streamlit-aggrid
