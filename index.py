@@ -14,6 +14,13 @@ try:
 except:
     pass
 
+def make_grid(cols,rows):
+    grid = [0]*cols
+    for i in range(cols):
+        with st.container():
+            grid[i] = st.columns(rows)
+    return grid
+
 st.title('Change Propagation')
 
 st.header('Definitions')
@@ -41,10 +48,15 @@ st.header('1. Initial Analysis')
 st.subheader('1.1. Create Product Model')
 st.markdown('''
     a. power supply
+
     b. motor
+
     c. heating unit
+
     d. fan
+
     e. control system
+
     f. casing
 ''')
 product_components =   ['power supply',
@@ -65,7 +77,12 @@ DSM =  [[0,1,1,0,0,0],
         [1,1,1,0,0,1],
         [0,0,1,1,0,1],
         [1,1,1,1,1,0]]
-ppm(DSM)
+st.write("DSM = ")
+mygrid_DSM = make_grid(len(DSM),len(DSM[0]))
+for i,row in enumerate(DSM):
+    for j,cell in enumerate(row):
+        mygrid_DSM[i][j].write(cell)
+
 
 # Direct likelihood matrix (l)
 direct_likelihood_matrix = [[0.0,0.3,0.3,0.0,0.0,0.0],
@@ -74,7 +91,11 @@ direct_likelihood_matrix = [[0.0,0.3,0.3,0.0,0.0,0.0],
                             [0.3,0.6,0.9,0.0,0.0,0.9],
                             [0.0,0.0,0.3,0.6,0.0,0.3],
                             [0.3,0.9,0.6,0.9,0.6,0.0]]
-ppm(direct_likelihood_matrix)
+st.write("Direct likelihood matrix (l) = ")
+mygrid_direct_likelihood_matrix = make_grid(len(direct_likelihood_matrix),len(direct_likelihood_matrix[0]))
+for i,row in enumerate(direct_likelihood_matrix):
+    for j,cell in enumerate(row):
+        mygrid_direct_likelihood_matrix[i][j].write(cell)
 
 # Direct impact matrix (i)
 direct_impact_matrix = [[0.0,0.9,0.9,0.0,0.0,0.0],
@@ -83,12 +104,21 @@ direct_impact_matrix = [[0.0,0.9,0.9,0.0,0.0,0.0],
                         [0.3,0.3,0.6,0.0,0.0,0.3],
                         [0.0,0.0,0.3,0.3,0.0,0.3],
                         [0.3,0.6,0.6,0.9,0.6,0.0]]
-ppm(direct_impact_matrix)
+st.write("Direct impact matrix (i) = ")
+mygrid_direct_impact_matrix = make_grid(len(direct_impact_matrix),len(direct_impact_matrix[0]))
+for i,row in enumerate(direct_impact_matrix):
+    for j,cell in enumerate(row):
+        mygrid_direct_impact_matrix[i][j].write(cell)
 
 # Direct risk matrix (r)
 #TODO make into function
 direct_risk_matrix = (np.array(direct_likelihood_matrix)*np.array(direct_impact_matrix)).tolist()
-ppm(direct_risk_matrix)
+st.write("Direct risk matrix (r) = ")
+mygrid_direct_risk_matrix = make_grid(len(direct_risk_matrix),len(direct_risk_matrix[0]))
+for i,row in enumerate(direct_risk_matrix):
+    for j,cell in enumerate(row):
+        mygrid_direct_risk_matrix[i][j].write(cell)
+
 
 st.subheader('1.3. Compute Predictive Matrices')
 st.markdown('''
@@ -109,14 +139,26 @@ $l_{b,u} \cap l_{b,v} = l_{b,u} + l_{b,v} - (l_{b,u} \times l_{b,v}) = 1 - ((1 -
 
 # Combined likelihood matrix (L)
 clm = combined_likelihood_matrix(DSM,direct_likelihood_matrix)
-print(clm)
+st.write("Combined likelihood matrix (L) = ")
+mygrid_clm = make_grid(len(clm),len(clm[0]))
+for i,row in enumerate(clm):
+    for j,cell in enumerate(row):
+        mygrid_clm[i][j].write(cell)
 
 # Combined risk matrix (R)
 crm = combined_risk_matrix(DSM,direct_likelihood_matrix,direct_impact_matrix)
-print(crm)
+st.write("Combined risk matrix (R) = ")
+mygrid_crm = make_grid(len(crm),len(crm[0]))
+for i,row in enumerate(crm):
+    for j,cell in enumerate(row):
+        mygrid_crm[i][j].write(cell)
 
 # Combined impact matrix (I) combined_impact_matrix
 cim = combined_impact_matrix(DSM,clm,crm)
-print(cim)
+st.write("Combined impact matrix (I) = ")
+mygrid_cim = make_grid(len(cim),len(cim[0]))
+for i,row in enumerate(cim):
+    for j,cell in enumerate(row):
+        mygrid_cim[i][j].write(cell)
 
 plot_product_risk_matrix(product_components,DSM,clm,cim,crm)
