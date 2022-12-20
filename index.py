@@ -26,6 +26,22 @@ def make_grid(cols,rows):
 
 st.title('Change Propagation')
 
+# Upload files
+uploaded_files = st.file_uploader(
+    "Files, e.g. matrices.csv",
+    type="csv",
+    accept_multiple_files=True
+)
+
+if ('uploaded_files' in locals()) and (uploaded_files != []):
+    st.write(f"{len(uploaded_files)} files uploaded")
+    for file in uploaded_files:
+        df_file = pd.read_csv(file)
+        check_boxes = st.checkbox(file.name, key=file.id)
+        if check_boxes:
+            st.write(file.id)
+
+
 with st.expander('Definitions'):
     st.markdown('''
     $a$: destination of change
