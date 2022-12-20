@@ -6,3 +6,5 @@ plotly
 matplotlib
 networkx
 seaborn
+pyvis
+scipy
