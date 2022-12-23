@@ -1,13 +1,18 @@
 """
 # Change Propagation Method (CPM)
-This app describes the Change Propagation Method (CPM) and it lets you play with it.
+This app describes the Change Propagation Method (CPM) and it lets you play 
+with it.
 """
 import streamlit as st
 import pandas as pd
 import numpy as np
 import networkx as nx
 
-from helpers.app_helpers import ppm, combined_likelihood_matrix, combined_risk_matrix, combined_impact_matrix, plot_product_risk_matrix
+from helpers.app_helpers import (
+    combined_likelihood_matrix,
+    combined_risk_matrix,
+    combined_impact_matrix
+)
 
 # Set wide display, if not done before
 try:
