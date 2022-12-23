@@ -226,8 +226,7 @@ def plot_product_risk_matrix(product_components,DSM,clm,cim,crm):
     return probability_matrix """
 
 
-""" 
-def plot_propagation_tree(propagation_tree):
+""" def plot_propagation_tree(propagation_tree):
         labels = nx.get_node_attributes(propagation_tree, 'name') 
         pos = hierarchy_pos(propagation_tree)
         plt.figure(figsize=(40,10))
