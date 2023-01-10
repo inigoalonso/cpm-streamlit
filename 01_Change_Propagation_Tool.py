@@ -4,9 +4,9 @@ This app describes the Change Propagation Method (CPM) and it lets you play
 with it.
 """
 import streamlit as st
-import pandas as pd
 import numpy as np
-import networkx as nx
+
+from cpm.cpm import calculate_all_matrices
 
 from helpers.app_helpers import (
     combined_likelihood_matrix,
@@ -50,24 +50,21 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
         st.button('Download results')
 
 
-# Product components
-product_components =   ['power supply',
-                        'motor',
-                        'heating unit',
-                        'fan',
-                        'control system',
-                        'casing']
+# Product elements
+product_elements = ['power supply',
+                    'motor',
+                    'heating unit',
+                    'fan',
+                    'control system',
+                    'casing']
 
 # Design structure Matrix (DSM)
-DSM =  [[0,1,1,0,0,0],
-        [1,0,0,1,1,1],
-        [1,0,0,1,1,1],
-        [1,1,1,0,0,1],
-        [0,0,1,1,0,1],
-        [1,1,1,1,1,0]]
-
-A = pd.DataFrame(DSM, index=product_components, columns=product_components)
-G = nx.from_pandas_adjacency(A, create_using=nx.DiGraph)
+design_structure_matrix =  [[0,1,1,0,0,0],
+                            [1,0,0,1,1,1],
+                            [1,0,0,1,1,1],
+                            [1,1,1,0,0,1],
+                            [0,0,1,1,0,1],
+                            [1,1,1,1,1,0]]
 
 # Direct likelihood matrix (l)
 direct_likelihood_matrix = [[0.0,0.3,0.3,0.0,0.0,0.0],
@@ -78,22 +75,30 @@ direct_likelihood_matrix = [[0.0,0.3,0.3,0.0,0.0,0.0],
                             [0.3,0.9,0.6,0.9,0.6,0.0]]
 
 # Direct impact matrix (i)
-direct_impact_matrix = [[0.0,0.9,0.9,0.0,0.0,0.0],
-                        [0.9,0.0,0.0,0.6,0.3,0.3],
-                        [0.6,0.0,0.0,0.3,0.3,0.3],
-                        [0.3,0.3,0.6,0.0,0.0,0.3],
-                        [0.0,0.0,0.3,0.3,0.0,0.3],
-                        [0.3,0.6,0.6,0.9,0.6,0.0]]
+direct_impact_matrix =     [[0.0,0.9,0.9,0.0,0.0,0.0],
+                            [0.9,0.0,0.0,0.6,0.3,0.3],
+                            [0.6,0.0,0.0,0.3,0.3,0.3],
+                            [0.3,0.3,0.6,0.0,0.0,0.3],
+                            [0.0,0.0,0.3,0.3,0.0,0.3],
+                            [0.3,0.6,0.6,0.9,0.6,0.0]]
 
-# Direct risk matrix (r = l * i)
-#TODO make into function
-direct_risk_matrix = (np.array(direct_likelihood_matrix)*np.array(direct_impact_matrix)).tolist()
+cutoff = 3
 
-# Combined likelihood matrix (L)
-clm = combined_likelihood_matrix(DSM,direct_likelihood_matrix)
+# Calculate all matrices
+likelihood_matrix, risk_matrix, impact_matrix = calculate_all_matrices(
+    design_structure_matrix,
+    direct_likelihood_matrix,
+    direct_impact_matrix,
+    cutoff
+)
 
-# Combined risk matrix (R)
-crm = combined_risk_matrix(DSM,direct_likelihood_matrix,direct_impact_matrix)
+st.write('Likelihood matrix')
+st.write(np.array(likelihood_matrix))
 
-# Combined impact matrix (I) combined_impact_matrix
-cim = combined_impact_matrix(DSM,clm,crm)
+st.write('Risk matrix')
+st.write(np.array(risk_matrix))
+
+st.write('Impact matrix')
+st.write(np.array(impact_matrix))
+
+
