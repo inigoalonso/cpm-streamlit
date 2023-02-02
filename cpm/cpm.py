@@ -132,7 +132,7 @@ def calculate_combined_likelihood_matrix(design_structure_matrix,direct_likeliho
     cutoff: maximum length of paths
     '''
     number_elements = len(design_structure_matrix)
-    g = nx.from_numpy_matrix(np.transpose(np.matrix(design_structure_matrix)), create_using=nx.DiGraph)
+    g = nx.from_numpy_array(np.transpose(np.matrix(design_structure_matrix)), create_using=nx.DiGraph)
     combined_likelihood_matrix = [[0 for col in range(number_elements)] for row in range(number_elements)]
     for target, row in enumerate(design_structure_matrix):
         for source, element in enumerate(row):
