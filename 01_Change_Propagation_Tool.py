@@ -7,6 +7,7 @@ import streamlit as st
 import numpy as np
 import csv
 import io
+import zipfile
 
 from cpm.cpm import calculate_all_matrices
 
@@ -45,7 +46,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
         st.header('3. Results')
         for uploaded_file in uploaded_files:
             st.subheader(uploaded_file.name)
-            st.write(uploaded_file.getvalue())
+            #st.write(uploaded_file.getvalue())
 
             # Create a file object from the uploaded file
             file = io.StringIO(uploaded_file.getvalue().decode("utf-8"))
@@ -55,7 +56,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
             
             # Count the number of rows
             row_count = sum(1 for row in reader)
-            st.write(f"Total number of rows in the present file is {row_count}")
+            #st.write(f"Total number of rows in the present file is {row_count}")
             
             # Go back to the start of the file
             file.seek(0)
@@ -63,7 +64,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
             # Get the first row to determine the number of columns
             header = next(reader)
             col_count = len(header)
-            st.write(f"Total number of columns in the present file is {col_count}")
+            #st.write(f"Total number of columns in the present file is {col_count}")
             
             # Go back to the start of the file
             file.seek(0)
@@ -84,7 +85,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                 next(reader)
 
             if col_count - 2 == row_count - 4:
-                st.write('This is a simple matrix')
+                #st.write('This is a simple matrix')
                 dimension = col_count - 2
                 matrix = np.zeros((dimension, dimension))
                 for i, row in enumerate(reader):
@@ -104,7 +105,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                 )
 
             elif col_count - 2 == int((row_count - 3) / 2):
-                st.write('This is a double matrix')
+                #st.write('This is a double matrix')
                 dimension = col_count - 2
                 direct_likelihood_matrix = np.zeros((dimension, dimension))
                 direct_impact_matrix = np.zeros((dimension, dimension))
@@ -117,8 +118,8 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                         for j, element in enumerate(row[2:]):
                             if element.strip():
                                 direct_impact_matrix[int(i/2), j] = float(element)
-                st.write(direct_likelihood_matrix)
-                st.write(direct_impact_matrix)
+                #st.write(direct_likelihood_matrix)
+                #st.write(direct_impact_matrix)
                 
                 design_structure_matrix = [[1 if x != 0 else x for x in sublist] for sublist in direct_impact_matrix]
 
@@ -133,11 +134,11 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
             st.write('Likelihood matrix')
             st.write(np.array(likelihood_matrix))
 
-            st.write('Risk matrix')
-            st.write(np.array(risk_matrix))
-
             st.write('Impact matrix')
             st.write(np.array(impact_matrix))
+
+            st.write('Risk matrix')
+            st.write(np.array(risk_matrix))
 
             st.markdown('---')
 
