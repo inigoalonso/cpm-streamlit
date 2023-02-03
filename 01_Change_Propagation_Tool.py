@@ -131,16 +131,33 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                     change_path_length
                 )
                 
-            st.write('Likelihood matrix')
-            st.write(np.array(likelihood_matrix))
+            #st.write('Likelihood matrix')
+            #st.write(np.array(likelihood_matrix))
 
-            st.write('Impact matrix')
-            st.write(np.array(impact_matrix))
+            #st.write('Impact matrix')
+            #st.write(np.array(impact_matrix))
 
             st.write('Risk matrix')
             st.write(np.array(risk_matrix))
 
+            # Save the list of lists to a CSV text
+            file = io.StringIO()
+            writer = csv.writer(file)
+            writer.writerows(risk_matrix)
+
+            def callback():
+                st.balloons()
+            # Provide a download button
+            st.download_button(
+                label="Press to Download",
+                data=file.getvalue(),
+                file_name="my_csv_file.csv",
+                mime="text/csv",
+                on_click=callback,
+                key='callback'
+            )
+
             st.markdown('---')
 
-        st.button('Download results')
+        #st.button('Download results')
 
