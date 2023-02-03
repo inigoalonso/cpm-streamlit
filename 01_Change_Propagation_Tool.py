@@ -110,15 +110,11 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                 direct_impact_matrix = np.zeros((dimension, dimension))
                 for i, row in enumerate(reader):
                     if i % 2 == 0:
-                        print (f'row {i} is even')
                         for j, element in enumerate(row[2:]):
-                            print(int(i/2), j, element)
                             if element.strip():
                                 direct_likelihood_matrix[int(i/2), j] = float(element)
                     else:
-                        print (f'row {i} is odd')
                         for j, element in enumerate(row[2:]):
-                            print(int(i/2), j, element)
                             if element.strip():
                                 direct_impact_matrix[int(i/2), j] = float(element)
                 st.write(direct_likelihood_matrix)
