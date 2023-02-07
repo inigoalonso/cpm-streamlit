@@ -158,16 +158,16 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
             writer = csv.writer(file)
             writer.writerows(risk_matrix)
 
-            def callback():
-                st.balloons()
+            # def callback():
+            #    st.balloons()
             # Provide a download button
             st.download_button(
                 label="Press to Download",
                 data=file.getvalue(),
                 file_name="my_csv_file.csv",
                 mime="text/csv",
-                on_click=callback,
-                key='callback'
+                #on_click=callback,
+                #key='callback'
             )
 
             st.markdown('---')
