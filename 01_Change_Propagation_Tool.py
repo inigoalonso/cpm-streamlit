@@ -65,28 +65,39 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
             header = next(reader)
             col_count = len(header)
             #st.write(f"Total number of columns in the present file is {col_count}")
-            
-            # Go back to the start of the file
-            file.seek(0)
 
-            # Skip the first 4 rows
-            for i in range(4):
-                next(reader)
-            
+            if header[0] == 'DSM EXPORTED FROM CAMBRIDGE ADVANCED MODELLER':
+                rows_to_skip = 4
+            else:
+                rows_to_skip = 1
+
+            # Skip the first n rows
+            for i in range(rows_to_skip-1):
+                header = next(reader)
+
             # Store the elements of the first column in a list
             product_elements = [row[0] for row in reader if row[0].strip()]
+
+            if header[0] == 'ELEMENT NAME':
+                columns_to_skip = 2
+                name_column = 0
+            elif header[1] == 'ELEMENT NAME':
+                columns_to_skip = 3
+                name_column = 1
+
+            # Store the elements of the ELEMENT NAME column in a list
+            product_elements = [row[name_column] for row in reader if row[name_column].strip()]
             #st.write(product_elements)
             
             # Go back to the start of the file
             file.seek(0)
-                
-            # Skip the first 4 rows
-            for i in range(4):
+            
+            # Skip the first n rows
+            for i in range(rows_to_skip):
                 next(reader)
 
             if col_count - 2 == row_count - 4:
-                #st.write('This is a simple matrix')
-                dimension = col_count - 2
+                st.write('This is a simple matrix')
                 matrix = np.zeros((dimension, dimension))
                 for i, row in enumerate(reader):
                     for j, element in enumerate(row[2:]):
@@ -104,9 +115,10 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                     change_path_length
                 )
 
-            elif col_count - 2 == int((row_count - 3) / 2):
-                #st.write('This is a double matrix')
-                dimension = col_count - 2
+            #elif col_count - 2 == int((row_count - 3) / 2):
+            else:
+                st.write('This is a double matrix')
+                dimension = col_count - columns_to_skip
                 direct_likelihood_matrix = np.zeros((dimension, dimension))
                 direct_impact_matrix = np.zeros((dimension, dimension))
                 for i, row in enumerate(reader):
