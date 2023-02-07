@@ -8,6 +8,7 @@ import numpy as np
 import csv
 import io
 import zipfile
+import time
 
 from cpm.cpm import calculate_all_matrices
 
@@ -45,6 +46,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
         submit_button = st.form_submit_button(label='Apply CPM')
     if submit_button:
         st.header('3. Results')
+        result_files = {}
         for uploaded_file in uploaded_files:
             st.subheader(uploaded_file.name)
             #st.write(uploaded_file.getvalue())
@@ -157,6 +159,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
             file = io.StringIO()
             writer = csv.writer(file)
             writer.writerows(risk_matrix)
+            result_files[uploaded_file.name] = file.getvalue()
 
             # def callback():
             #    st.balloons()
@@ -164,7 +167,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
             st.download_button(
                 label="Press to Download",
                 data=file.getvalue(),
-                file_name="my_csv_file.csv",
+                file_name="risk_"+uploaded_file.name,
                 mime="text/csv",
                 #on_click=callback,
                 #key='callback'
@@ -172,5 +175,19 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
 
             st.markdown('---')
 
-        #st.button('Download results')
-
+        # Create a timestamp
+        timestr = time.strftime("%Y%m%d_%H%M%S_")
+        # Create a zip file
+        with zipfile.ZipFile(f"{timestr}results.zip", mode="w") as archive:
+            for file in result_files:
+                print(file)
+                print(result_files[file])
+                archive.writestr("risk_"+file, data=result_files[file])
+        # Provide a download button
+        with open(f"{timestr}results.zip", "rb") as file:
+            st.download_button(
+                label="Download all results",
+                data=file,
+                file_name=f"{timestr}results.zip",
+                mime="application/zip",
+            )
