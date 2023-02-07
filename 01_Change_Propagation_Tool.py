@@ -23,6 +23,16 @@ try:
 except:
     pass
 
+# Hide the menu and the footer
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 st.title('Change Propagation Tool')
 
 in_col1, in_col2 = st.columns(2)
