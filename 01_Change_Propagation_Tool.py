@@ -130,8 +130,8 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                         for j, element in enumerate(row[columns_to_skip:]):
                             if element.strip():
                                 direct_impact_matrix[int(i/2), j] = float(element)
-                st.write(direct_likelihood_matrix)
-                st.write(direct_impact_matrix)
+                #st.write(direct_likelihood_matrix)
+                #st.write(direct_impact_matrix)
                 
                 design_structure_matrix = [[1 if x != 0 else x for x in sublist] for sublist in direct_impact_matrix]
 
