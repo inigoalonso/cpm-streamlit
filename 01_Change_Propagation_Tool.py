@@ -100,7 +100,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                 st.write('This is a simple matrix')
                 matrix = np.zeros((dimension, dimension))
                 for i, row in enumerate(reader):
-                    for j, element in enumerate(row[2:]):
+                    for j, element in enumerate(row[columns_to_skip:]):
                         if element.strip():
                             matrix[i, j] = float(element)
                 st.write(matrix)
@@ -123,15 +123,15 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                 direct_impact_matrix = np.zeros((dimension, dimension))
                 for i, row in enumerate(reader):
                     if i % 2 == 0:
-                        for j, element in enumerate(row[2:]):
+                        for j, element in enumerate(row[columns_to_skip:]):
                             if element.strip():
                                 direct_likelihood_matrix[int(i/2), j] = float(element)
                     else:
-                        for j, element in enumerate(row[2:]):
+                        for j, element in enumerate(row[columns_to_skip:]):
                             if element.strip():
                                 direct_impact_matrix[int(i/2), j] = float(element)
-                #st.write(direct_likelihood_matrix)
-                #st.write(direct_impact_matrix)
+                st.write(direct_likelihood_matrix)
+                st.write(direct_impact_matrix)
                 
                 design_structure_matrix = [[1 if x != 0 else x for x in sublist] for sublist in direct_impact_matrix]
 
