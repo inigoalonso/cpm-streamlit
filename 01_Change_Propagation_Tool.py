@@ -16,7 +16,8 @@ try:
     st.set_page_config(
         layout="wide",
         page_title="Change Propagation Method (CPM) Tool",
-        page_icon="🧊",)
+        page_icon="🧊",
+        initial_sidebar_state="collapsed",)
 except:
     pass
 
