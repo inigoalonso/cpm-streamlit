@@ -311,6 +311,7 @@ def plot_product_risk_matrix(product_elements,DSM,clm,cim,crm):
     plt.gca().invert_yaxis()
     plt.grid()
     plt.show()
+    return fig
 
 
 def calculate_statistics(combined_risk_matrix, product_elements):
