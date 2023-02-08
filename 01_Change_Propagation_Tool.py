@@ -14,7 +14,7 @@ import time
 import plotly.express as px
 import plotly.graph_objects as go
 
-from cpm.cpm import calculate_all_matrices
+from cpm.cpm import calculate_all_matrices, plot_product_risk_matrix
 
 # Set wide display, if not done before
 try:
@@ -44,6 +44,25 @@ st.title('Change Propagation Tool')
 with st.sidebar:
     # Upload files
     st.header('Inputs')
+    
+    # Example files
+    with st.expander("Example csv files"):
+        st.caption("You can use the following example files to test the app:")
+        c1, c2 = st.columns([1,1])
+        with open("./inputs/example1.csv", "r") as f:
+            c1.download_button(
+                label="Example 1",
+                data=f,
+                file_name="example1.csv",
+                mime="text/csv"
+            )
+        with open("./inputs/example2.csv", "r") as f:
+            c1.download_button(
+                label="Example 2",
+                data=f,
+                file_name="example2.csv",
+                mime="text/csv"
+            )
     with st.form(key='upload_form'):
         uploaded_files = st.file_uploader(
             "Files, e.g. dsm01.csv, dsm02.csv, ...",
@@ -246,7 +265,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                 )
 
             with col2:
-                with st.expander(f'Plot of {display_option[file_number]}', expanded=True):
+                with st.expander(f'Plot of {display_option[file_number]} as heatmap', expanded=True):
                     fig = px.imshow(
                         datasets[display_option[file_number]],
                         labels=dict(x="", y=""),
@@ -319,6 +338,11 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                 #             'modeBarButtonsToRemove': ['sendDataToCloud', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'toggleSpikelines']
                 #         }
                 #     )
+                with st.expander(f'Plot of the Combined Risk Matrix', expanded=False):
+                    fig = plot_product_risk_matrix(product_elements, design_structure_matrix, likelihood_matrix, impact_matrix, risk_matrix)
+                    st.pyplot(
+                        fig
+                    )
 
 
     # Create a timestamp
