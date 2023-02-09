@@ -277,7 +277,7 @@ def plot_product_risk_matrix(product_elements,DSM,clm,cim,crm):
 
     dx = [item for sublist in clm for item in sublist]
     dy = [item for sublist in cim for item in sublist]
-    z = [item for sublist in crm for item in sublist]
+    z  = [item for sublist in crm for item in sublist]
 
     cmap = plt.cm.coolwarm
     fig = plt.figure(figsize=(10,10))
@@ -290,27 +290,24 @@ def plot_product_risk_matrix(product_elements,DSM,clm,cim,crm):
     for tick in ax.xaxis.get_minor_ticks():
         tick.tick1line.set_markersize(0)
         tick.tick2line.set_markersize(0)
-        tick.label1.set_horizontalalignment('center')
 
     # Tick labels
     #TODO fix labels so the show in between ticks
-    ax.set_xticklabels(product_elements)
+    ax.set_xticklabels(product_elements, rotation=40, ha="left", rotation_mode="anchor")
     ax.set_yticklabels(product_elements)
-    # for label in ax.get_xticklabels():
-    #     label.set_horizontalalignment('center')
+    # Set the x-axis on top
+    ax.xaxis.tick_top()
 
     for x, y, c, h, w in zip(x, y, z, dx, dy):
         ax.add_artist(Rectangle(xy=(x, y),
                     color=cmap(c),
                     width=w, height=h))
 
-    #plt.ylabel(product_components)
-
     plt.xlim([0, n])
     plt.ylim([0, n])
     plt.gca().invert_yaxis()
     plt.grid()
-    plt.show()
+    #plt.show()
     return fig
 
 
