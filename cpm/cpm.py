@@ -2,6 +2,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
+import matplotlib as mpl
 
 
 # Direct risk matrix (r)
@@ -275,8 +276,8 @@ def plot_product_risk_matrix(product_elements,DSM,clm,cim,crm):
             x.append(j)
             y.append(i)
 
-    dx = [item for sublist in clm for item in sublist]
-    dy = [item for sublist in cim for item in sublist]
+    dx = [item for sublist in clm for item in sublist] # Height
+    dy = [item for sublist in cim for item in sublist] # Width
     z  = [item for sublist in crm for item in sublist]
 
     cmap = plt.cm.coolwarm
@@ -295,17 +296,28 @@ def plot_product_risk_matrix(product_elements,DSM,clm,cim,crm):
     #TODO fix labels so the show in between ticks
     ax.set_xticklabels(product_elements, rotation=40, ha="left", rotation_mode="anchor")
     ax.set_yticklabels(product_elements)
-    # Set the x-axis on top
-    ax.xaxis.tick_top()
 
     for x, y, c, h, w in zip(x, y, z, dx, dy):
         ax.add_artist(Rectangle(xy=(x, y),
                     color=cmap(c),
                     width=w, height=h))
 
+    # Set the limits of the plot to the limits of the data
     plt.xlim([0, n])
     plt.ylim([0, n])
+    # Name the axes
+    plt.ylabel('Likelihood')
+    plt.xlabel('Impact')
+    # Set the x-axis on top
+    ax.xaxis.tick_top()
+    ax.xaxis.set_label_position('top')
+    # Invert the y-axis
     plt.gca().invert_yaxis()
+    # Add a colorbar
+    norm = mpl.colors.Normalize(vmin=0, vmax=1)
+    plt.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),
+                orientation='vertical', label='Risk', shrink=0.5)
+    # Add a grid
     plt.grid()
     #plt.show()
     return fig
