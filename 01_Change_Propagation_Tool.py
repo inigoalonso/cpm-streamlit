@@ -232,6 +232,19 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                 'Combined Likelihood Matrix': likelihood_matrix,
                 'Combined Impact Matrix': impact_matrix
             }
+            statistics = {
+                'Product Element': product_elements,
+                'Mean Risk': [np.mean(risk_matrix[i]) for i in range(len(product_elements))],
+                'Standard Deviation of Risk': [np.std(risk_matrix[i]) for i in range(len(product_elements))],
+                'Variance of Risk': [np.var(risk_matrix[i]) for i in range(len(product_elements))],
+                'Mean Likelihood': [np.mean(likelihood_matrix[i]) for i in range(len(product_elements))],
+                'Standard Deviation of Likelihood': [np.std(likelihood_matrix[i]) for i in range(len(product_elements))],
+                'Variance of Likelihood': [np.var(likelihood_matrix[i]) for i in range(len(product_elements))],
+                'Mean Impact': [np.mean(impact_matrix[i]) for i in range(len(product_elements))],
+                'Standard Deviation of Impact': [np.std(impact_matrix[i]) for i in range(len(product_elements))],
+                'Variance of Impact': [np.var(impact_matrix[i]) for i in range(len(product_elements))],
+            }
+            df_statistics = pd.DataFrame(statistics, index=product_elements)
             display_option[file_number] = st.selectbox(
                 'Select matrix to display',
                 list(datasets.keys()),
@@ -265,7 +278,12 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                 )
 
             with col2:
-                with st.expander(f'Plot of {display_option[file_number]} as heatmap', expanded=True):
+                with st.expander(f'Plot of the Combined Risk Matrix', expanded=True):
+                    fig = plot_product_risk_matrix(product_elements, design_structure_matrix, likelihood_matrix, impact_matrix, risk_matrix)
+                    st.pyplot(
+                        fig
+                    )
+                with st.expander(f'Plot of {display_option[file_number]} as heatmap', expanded=False):
                     fig = px.imshow(
                         datasets[display_option[file_number]],
                         labels=dict(x="", y=""),
@@ -275,7 +293,7 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                         #title='Combined Risk Matrix',
                         width=800,
                         height=600,
-                        #text_auto='.2f',
+                        text_auto='.2f',
                         aspect='equal',
                     )
                     fig.update_layout(
@@ -290,58 +308,45 @@ if ('uploaded_files' in locals()) and (uploaded_files != []):
                             'modeBarButtonsToRemove': ['sendDataToCloud', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'toggleSpikelines']
                         }
                     )
-                # with st.expander(f'Plot of {display_option[file_number]} as network', expanded=False):
-                #     G = nx.from_numpy_matrix(np.array(datasets[display_option[file_number]]))
-                #     pos = nx.spring_layout(G)
-                #     fig = go.Figure()
-                #     fig.add_trace(go.Scatter(
-                #         x=[pos[k][0] for k in pos.keys()],
-                #         y=[pos[k][1] for k in pos.keys()],
-                #         mode='markers',
-                #         marker=dict(
-                #             size=[100*np.mean(datasets[display_option[file_number]][i]) for i in range(len(product_elements))],
-                #             color=[np.mean(datasets[display_option[file_number]][i]) for i in range(len(product_elements))],
-                #             colorscale='dense',
-                #             showscale=True,
-                #         ),
-                #         text=[product_elements[i] for i in range(len(product_elements))],
-                #         hoverinfo='text',
-                #     ))
-                #     fig.update_layout(
-                #         xaxis=dict(
-                #             showgrid=False,
-                #             zeroline=False,
-                #             showticklabels=False,
-                #         ),
-                #         yaxis=dict(
-                #             showgrid=False,
-                #             zeroline=False,
-                #             showticklabels=False,
-                #         ),
-                #         width=800,
-                #         height=600,
-                #         margin=dict(
-                #             l=0,
-                #             r=0,
-                #             b=0,
-                #             t=0,
-                #             pad=0
-                #         ),
-                #         hovermode='closest',
-                #         showlegend=False,
-                #     )
-                #     st.plotly_chart(
-                #         fig,
-                #         use_container_width=True,
-                #         config={
-                #             'displaylogo': False,
-                #             'modeBarButtonsToRemove': ['sendDataToCloud', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'toggleSpikelines']
-                #         }
-                #     )
-                with st.expander(f'Plot of the Combined Risk Matrix', expanded=False):
-                    fig = plot_product_risk_matrix(product_elements, design_structure_matrix, likelihood_matrix, impact_matrix, risk_matrix)
-                    st.pyplot(
-                        fig
+                with st.expander(f'Plot of the Case Risk', expanded=True):
+                    fig1 = px.scatter(
+                        # x= [np.mean(datasets['Combined Likelihood Matrix'][i]) for i in range(len(product_elements))],
+                        # y= [np.mean(datasets['Combined Impact Matrix'][i]) for i in range(len(product_elements))],
+                        # color= [np.mean(datasets['Combined Risk Matrix'][i]) for i in range(len(product_elements))],
+                        data_frame=df_statistics,
+                        x='Mean Likelihood',
+                        y='Mean Impact',
+                        #error_x='Standard Deviation of Likelihood',
+                        #error_y='Standard Deviation of Impact',
+                        color='Mean Risk',
+                        size='Mean Risk',
+                        size_max=20,
+                        color_continuous_scale='dense',
+                        labels=dict(x="Mean Likelihood", y="Mean Impact", color="Mean Risk"),
+                        hover_data=['Product Element'],
+                    )
+                    #fig = go.Figure(data=[fig1.data[0]])
+                    # Create an evenly spaced grid of values in the interval [0, 1] for x
+                    x = np.linspace(0, 1, 100)
+                    for line in [{'c':0.1,'color':'darkgreen'}, {'c':0.25,'color':'green'}, {'c':0.5,'color':'yellow'}, {'c':0.75,'color':'orange'}, {'c':0.9,'color':'red'}]:
+                        y = line['c'] / x
+                        fig2 = px.line(x=x, y=y, color_discrete_sequence=[line['color']])
+                        fig1.add_trace(fig2.data[0])
+                    # y = 0.1 / x
+                    # fig2 = px.line(x=x, y=y)
+                    fig1.update_xaxes(range=[0,1])
+                    fig1.update_yaxes(range=[0,1])
+                    fig1.update_yaxes(
+                        scaleanchor="x",
+                        scaleratio=1,
+                    )
+                    st.plotly_chart(
+                        fig1, 
+                        use_container_width=True,
+                        config={
+                            'displaylogo': False,
+                            'modeBarButtonsToRemove': ['sendDataToCloud', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'toggleSpikelines']
+                        }
                     )
 
 
