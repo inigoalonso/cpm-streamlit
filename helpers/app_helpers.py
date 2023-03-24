@@ -46,7 +46,7 @@ def propagation_tree(graph,target,source):
 
 def combined_likelihood_matrix(DSM,direct_likelihood_matrix):
     '''Returns the Combined likelihood matrix (L)'''
-    g = nx.from_numpy_matrix(np.transpose(np.matrix(DSM)), create_using=nx.DiGraph)
+    g = nx.from_numpy_array(np.transpose(np.matrix(DSM)), create_using=nx.DiGraph)
     combined_likelihood_matrix = [[0 for col in range(len(DSM))] for row in range(len(DSM))]
     for target, row in enumerate(DSM):
         #print(row)
@@ -87,7 +87,7 @@ def combined_likelihood_matrix(DSM,direct_likelihood_matrix):
 #TODO combined risk matrix is for now a copy of the combined likelihood matrix function
 def combined_risk_matrix(DSM,direct_likelihood_matrix,direct_impact_matrix):
     '''Returns the Combined risk matrix (R)'''
-    g = nx.from_numpy_matrix(np.transpose(np.matrix(DSM)), create_using=nx.DiGraph)
+    g = nx.from_numpy_array(np.transpose(np.matrix(DSM)), create_using=nx.DiGraph)
     combined_likelihood_matrix = [[0 for col in range(len(DSM))] for row in range(len(DSM))]
     for target, row in enumerate(DSM):
         #print(row)
@@ -313,7 +313,7 @@ def plot_product_risk_matrix(product_components,DSM,clm,cim,crm):
     '''Plot a graph described by a DSM matrix A'''
     # Transform to a Numpy matrix for generating networkx graph
     aNumpyMatrix = np.matrix(aMatrix)
-    g = nx.from_numpy_matrix(aNumpyMatrix, create_using=nx.DiGraph)
+    g = nx.from_numpy_array(aNumpyMatrix, create_using=nx.DiGraph)
 
     # layout
     #pos = nx.spring_layout(G, iterations=50)
