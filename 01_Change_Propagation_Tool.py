@@ -14,7 +14,7 @@ import time
 import plotly.express as px
 import plotly.graph_objects as go
 
-from cpm.cpm import calculate_all_matrices, plot_product_risk_matrix
+from cpm_old.cpm import calculate_all_matrices, plot_product_risk_matrix
 
 # Set wide display, if not done before
 try:

@@ -9,3 +9,5 @@ seaborn
 pyvis
 scipy
 streamlit-aggrid
+cpm-lib
+ragraph[all]
