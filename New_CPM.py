@@ -134,7 +134,7 @@ if ('uploaded_dsm_impact' in locals()) and (uploaded_dsm_impact != None) and ('u
 
     # Create CSV string
     delimiter = "; "
-    csv = "\t"+delimiter
+    csv = "  "+delimiter
     csv += delimiter.join(dsm_l.columns) + "\n"
     for line in result_matrix:
         csv_line = delimiter.join(map(str, line))
