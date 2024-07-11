@@ -4,17 +4,9 @@ This app describes the Change Propagation Method (CPM) and it lets you play
 with it.
 """
 import streamlit as st
-import numpy as np
-import pandas as pd
-import networkx as nx
 import csv
 import io
-import zipfile
 import time
-import plotly.express as px
-import plotly.graph_objects as go
-from ragraph import plot
-from ragraph.io.matrix import from_matrix
 
 from typing import Union
 from cpm.parse import parse_csv
@@ -25,7 +17,7 @@ try:
     st.set_page_config(
         layout="wide",
         page_title="Change Propagation Method (CPM) Tool",
-        page_icon="🧊",
+        page_icon="🧮",
         initial_sidebar_state="expanded",)
 except:
     pass
