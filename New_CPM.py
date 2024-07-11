@@ -12,6 +12,21 @@ from typing import Union
 from cpm.parse import parse_csv
 from cpm.models import ChangePropagationTree
 
+
+def calculate_results(dsm_i, dsm_l):
+    # Create a matrix in which the results can be stored
+    result_matrix: list[list[Union[float, str]]] = []
+    for i, icol in enumerate(dsm_l.columns):
+        result_matrix.append([icol])
+
+        for j, jcol in enumerate(dsm_l.columns):
+            # Run change propagation on each possible pairing
+            cpt = ChangePropagationTree(j, i, dsm_impact=dsm_i, dsm_likelihood=dsm_l)
+            cpt.propagate(search_depth=4)
+            # Store results in matrix
+            result_matrix[i].append(cpt.get_risk())
+    return result_matrix
+
 # Set wide display, if not done before
 try:
     st.set_page_config(
@@ -33,7 +48,7 @@ hide_st_style = """
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
-st.toast(f"Streamlit version: {st.__version__}", icon="ℹ️")
+# st.toast(f"Streamlit version: {st.__version__}", icon="ℹ️")
 
 st.title('Change Propagation Tool')
 
@@ -44,18 +59,18 @@ st.header('Inputs')
 with st.expander("Example csv files"):
     st.caption("You can use the following example files to test the app:")
     c1, c2 = st.columns([1,1])
-    with open("./inputs/dsm-impact.csv", "r") as f:
+    with open("./inputs/dsm-impact.csv", "r") as file:
         c1.download_button(
             label="DSM Impact",
-            data=f,
+            data=file,
             file_name="dsm-impact.csv",
             mime="text/csv",
             use_container_width=True,
         )
-    with open("./inputs/dsm-likelihood.csv", "r") as f:
+    with open("./inputs/dsm-likelihood.csv", "r") as file:
         c2.download_button(
             label="DSM Likelihood",
-            data=f,
+            data=file,
             file_name="dsm-likelihood.csv",
             mime="text/csv",
             use_container_width=True,
@@ -114,18 +129,8 @@ if ('uploaded_dsm_impact' in locals()) and (uploaded_dsm_impact != None) and ('u
     # Create DSMs for Impacts and Likelihoods
     dsm_i = parse_csv(file_impact)
     dsm_l = parse_csv(file_likelihood)
-
-    # Create a matrix in which the results can be stored
-    result_matrix: list[list[Union[float, str]]] = []
-    for i, icol in enumerate(dsm_l.columns):
-        result_matrix.append([icol])
-
-        for j, jcol in enumerate(dsm_l.columns):
-            # Run change propagation on each possible pairing
-            cpt = ChangePropagationTree(j, i, dsm_impact=dsm_i, dsm_likelihood=dsm_l)
-            cpt.propagate(search_depth=4)
-            # Store results in matrix
-            result_matrix[i].append(cpt.get_risk())
+    
+    result_matrix = calculate_results(dsm_i, dsm_l)
 
     # Create CSV string
     delimiter = "; "
@@ -150,4 +155,5 @@ if ('uploaded_dsm_impact' in locals()) and (uploaded_dsm_impact != None) and ('u
             key='download_button',
             help='Download the results as a CSV file.',
             use_container_width=True,
+            type='primary',
         )
