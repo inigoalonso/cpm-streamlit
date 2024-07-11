@@ -41,11 +41,11 @@ hide_st_style = """
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
-st.toast(f"Streamlit version: {st.__version__}", icon="ℹ️")
+#st.write("Streamlit version:", st.__version__)
 
 st.title('Change Propagation Tool')
 
-# Inputs
+# Upload files
 st.header('Inputs')
 
 # Example files
@@ -68,23 +68,21 @@ with st.expander("Example csv files"):
             mime="text/csv",
             use_container_width=True,
         )
-
-# Upload files
 with st.expander("Inputs", expanded=True):
     with st.form(key='upload_form'):
         # three columns for the file upload
         col1, col2, col3 = st.columns([1, 1, 1])
         with col1:
-            st.markdown('#### Impact DSM')
+            st.markdown('### Impact DSM')
             uploaded_dsm_impact = st.file_uploader(
                 "Files, e.g. dsm-impact.csv",
                 type="csv",
                 accept_multiple_files=False,
                 key='file_uploader_impact',
-                help='Upload the file containing the Impact DSM.',
+                help='Upload the file containing the Impact DSM.'
             )
         with col2:
-            st.markdown('#### Likelihood DSM')
+            st.markdown('### Likelihood DSM')
             uploaded_dsm_likelihood = st.file_uploader(
                 "Files, e.g. dsm-likelihood.csv",
                 type="csv",
@@ -93,7 +91,7 @@ with st.expander("Inputs", expanded=True):
                 help='Upload the file containing the Likelihood DSM.'
             )
         with col3:
-            st.markdown('#### Options')
+            st.markdown('### Options')
             change_path_length = st.slider(
                 'Change path length',
                 min_value=1,
@@ -108,12 +106,18 @@ with st.expander("Inputs", expanded=True):
                 use_container_width=True,
                 type='primary',
             )
-
-# Results
+if (uploaded_dsm_impact != None and uploaded_dsm_likelihood != None):
+    st.header('Results')
+    results_container = st.container()
 
 if ('uploaded_dsm_impact' in locals()) and (uploaded_dsm_impact != None) and ('uploaded_dsm_likelihood' in locals()) and (uploaded_dsm_likelihood != None):
+    #print('uploaded_files:', [file.name for file in uploaded_files])
+    result_files = {}
 
-    # Create file objects from the uploaded files
+    #st.subheader(f"{file_number} {uploaded_file.name}")
+    #st.write(uploaded_file.getvalue())
+
+    # Create a file objects from the uploaded files
     file_impact = io.StringIO(uploaded_dsm_impact.getvalue().decode("utf-8"))
     file_likelihood = io.StringIO(uploaded_dsm_likelihood.getvalue().decode("utf-8"))
     
@@ -124,38 +128,52 @@ if ('uploaded_dsm_impact' in locals()) and (uploaded_dsm_impact != None) and ('u
     dsm_l = parse_csv(file_likelihood)
 
     # Create a matrix in which the results can be stored
-    result_matrix: list[list[Union[float, str]]] = []
+    res_mtx: list[list[Union[float, str]]] = []
     for i, icol in enumerate(dsm_l.columns):
-        result_matrix.append([icol])
+        res_mtx.append([icol])
 
         for j, jcol in enumerate(dsm_l.columns):
             # Run change propagation on each possible pairing
             cpt = ChangePropagationTree(j, i, dsm_impact=dsm_i, dsm_likelihood=dsm_l)
             cpt.propagate(search_depth=4)
             # Store results in matrix
-            result_matrix[i].append(cpt.get_risk())
+            res_mtx[i].append(cpt.get_risk())
+
+    # 
+
+    st.code(res_mtx)
+
+    # plot the dsm_i matrix witht the 
 
     # Create CSV string
     delimiter = "; "
     csv = "\t"+delimiter
     csv += delimiter.join(dsm_l.columns) + "\n"
-    for line in result_matrix:
+    for line in res_mtx:
         csv_line = delimiter.join(map(str, line))
+
         csv_line += "\n"
         csv += csv_line
 
-    # Timestamp for the file name
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    results_filename = f"cpm-{timestamp}.csv"
+    # Write to file
+    with open("cpm.csv", "w") as file:
+        file.write(csv)
 
-    with st.expander("Results", expanded=True):
-        # Display the download button
-        st.download_button(
-            label=f"Download {results_filename}",
-            data=csv,
-            file_name=results_filename,
-            mime="text/csv",
-            key='download_button',
-            help='Download the results as a CSV file.',
-            use_container_width=True,
-        )
+
+
+    st.write("Change Propagation Matrix")
+    st.write(res_mtx)
+    st.write("CSV file created")
+    st.write(csv)
+
+
+    g = from_matrix(dsm_i.matrix)
+
+    fig = plot.mdm(
+        leafs=g.leafs,
+        edges=g.edges,
+    )
+    st.plotly_chart(fig)
+
+# Display the session state
+#st.write('Session state: ',st.session_state)
